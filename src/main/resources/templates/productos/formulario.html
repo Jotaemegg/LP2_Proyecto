@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Café Origen - Formulario de Producto</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <header>
+        <h1>CAFÉ ORIGEN S.A.C.</h1>
+        <nav>
+            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" style="font-weight: bold; color: var(--secondary-color);"></span>
+            <a th:href="@{/dashboard}">Inicio</a>
+            <a th:href="@{/logout}" class="btn-logout">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="container" style="max-width: 600px;">
+        
+        <div class="card">
+            <h2 class="card-title" th:text="${producto.idProducto == null ? 'Registrar Nuevo Producto' : 'Modificar Producto'}"></h2>
+            
+            <form th:action="@{/productos/guardar}" th:object="${producto}" method="post">
+                
+                <!-- Campo oculto para el ID si es edición -->
+                <input type="hidden" th:field="*{idProducto}" />
+
+                <div class="form-group">
+                    <label for="nombre">Nombre del Producto</label>
+                    <input type="text" id="nombre" th:field="*{nombre}" class="form-control" placeholder="Ej: Café Espresso de Origen Cusco" required autocomplete="off">
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" th:field="*{categoria}" class="form-control" required>
+                        <option value="Bebidas Calientes">Bebidas Calientes</option>
+                        <option value="Bebidas Frías">Bebidas Frías</option>
+                        <option value="Café en Grano">Café en Grano</option>
+                        <option value="Postres">Postres</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio">Precio Unitario (S/)</label>
+                    <input type="number" step="0.10" id="precio" th:field="*{precio}" class="form-control" placeholder="Ej: 12.50" min="0.10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stock">Stock Inicial</label>
+                    <input type="number" id="stock" th:field="*{stock}" class="form-control" placeholder="Ej: 50" min="0" required>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Guardar Cambios</button>
+                    <a th:href="@{/productos}" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancelar</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Café Origen - Panel Principal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .action-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(111, 78, 55, 0.12);
+            border-color: var(--secondary-color);
+        }
+        .action-card h3 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+        }
+        .action-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        .welcome-panel {
+            background: linear-gradient(90deg, #6F4E37 0%, #4A3B32 100%);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 16px;
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .welcome-text h2 {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        .welcome-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CAFÉ ORIGEN S.A.C.</h1>
+        <nav>
+            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" style="font-weight: bold; color: var(--secondary-color);"></span>
+            <a th:href="@{/dashboard}">Inicio</a>
+            <a th:href="@{/logout}" class="btn-logout">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+        <div class="welcome-panel">
+            <div class="welcome-text">
+                <h2>Bienvenido a Café Origen</h2>
+                <p th:text="${'Hola ' + usuario.nombre + ', gestiona tus actividades y reservas en la plataforma.'}"></p>
+            </div>
+            <div class="role-indicator">
+                <span class="badge" th:text="${usuario.rol.nombre}" style="background-color: var(--secondary-color); color: var(--primary-color); font-size: 1rem; padding: 0.5rem 1.5rem;"></span>
+            </div>
+        </div>
+
+        <h2 style="font-size: 1.5rem; color: var(--primary-color); margin-bottom: 1rem; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem;">
+            Accesos Rápidos y Acciones Disponibles
+        </h2>
+
+        <div class="dashboard-grid">
+            
+            <!-- Acción: Salas / Espacios -->
+            <a th:href="@{/espacios}" class="action-card">
+                <h3>Salas & Mesas</h3>
+                <p>Ver salas de reuniones, salones de eventos y puestos de coworking disponibles.</p>
+            </a>
+
+            <!-- Acción: Productos de Cafetería -->
+            <a th:href="@{/productos}" class="action-card">
+                <h3>Café & Carta</h3>
+                <p>Gestionar y ver los cafés de especialidad, insumos de barra y repostería en stock.</p>
+            </a>
+
+            <!-- Acción: Nueva Reserva (Transaccional) -->
+            <a th:href="@{/reservas/nueva}" class="action-card">
+                <h3>Registrar Reserva</h3>
+                <p>Reservar una sala y asociar consumos iniciales de cafetería de forma atómica.</p>
+            </a>
+
+            <!-- Acción: Historial de Reservas -->
+            <a th:href="@{/reservas}" class="action-card">
+                <h3>Historial de Reservas</h3>
+                <p>Visualizar el histórico de alquileres de espacios y consumos acumulados.</p>
+            </a>
+
+            <!-- Acción: Gestión de Empleados (Solo Administrador) -->
+            <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/empleados}" class="action-card" style="border-color: rgba(111, 78, 55, 0.3);">
+                <h3>Gestión de Empleados</h3>
+                <p>Administrar el personal del local (recepcionistas, baristas) y configurar sus accesos.</p>
+            </a>
+
+            <!-- Acción: Dashboard Ventas (Solo Administrador) -->
+            <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/reportes/dashboard}" target="_blank" class="action-card" style="border-color: rgba(46, 125, 50, 0.3);">
+                <h3 style="color: var(--success-color);">Dashboard Gerencial PDF</h3>
+                <p>Descargar reporte financiero en PDF con gráficos de barra analíticos.</p>
+            </a>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Café Origen - Detalle de Reserva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .detail-section-title {
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            margin: 1.5rem 0 0.75rem 0;
+            font-weight: 600;
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>CAFÉ ORIGEN S.A.C.</h1>
+        <nav>
+            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" style="font-weight: bold; color: var(--secondary-color);"></span>
+            <a th:href="@{/dashboard}">Inicio</a>
+            <a th:href="@{/logout}" class="btn-logout">Cerrar Sesión</a>
+        </nav>
+    </header>
+
+    <div class="container" style="max-width: 800px;">
+        
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.5rem; color: var(--primary-color); border: none; padding: 0; margin: 0;">
+                    Comprobante de Reserva N° <span th:text="${reserva.idReserva}"></span>
+                </h2>
+                <a th:href="@{/reportes/boleta/{id}(id=${reserva.idReserva})}" target="_blank" class="btn btn-primary" style="background-color: var(--primary-color);">
+                    🖨️ Ver PDF
+                </a>
+            </div>
+
+            <!-- Resumen Cabecera -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background-color: #F5F5F0; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
+                <p><strong>Cliente:</strong> <span th:text="${reserva.cliente.nombre}"></span></p>
+                <p><strong>Email:</strong> <span th:text="${reserva.cliente.usuario.email}"></span></p>
+                <p><strong>F. Registro:</strong> <span th:text="${#temporals.format(reserva.fechaRegistro, 'dd/MM/yyyy HH:mm')}"></span></p>
+                <p><strong>Estado del Pago:</strong> <span class="badge badge-disponible">Completado</span></p>
+            </div>
+
+            <!-- Detalle Alquiler de Espacio -->
+            <div class="detail-section-title">Servicio de Alquiler de Espacio</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Espacio / Sala</th>
+                        <th>Fecha de Uso</th>
+                        <th>Horario Reservado</th>
+                        <th>Precio p/Hora</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="detEsp : ${detallesEspacio}">
+                        <td th:text="${detEsp.espacio.nombre}" style="font-weight: bold; color: var(--primary-color);"></td>
+                        <td th:text="${#localDates.format(detEsp.fechaReserva, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${detEsp.horaInicio + ':00 a ' + (detEsp.horaInicio + detEsp.horasUso) + ':00 (' + detEsp.horasUso + 'h)'}"></td>
+                        <td th:text="${'S/ ' + #numbers.formatDecimal(detEsp.espacio.precioHora, 1, 2)}"></td>
+                        <td th:text="${'S/ ' + #numbers.formatDecimal(detEsp.subtotal, 1, 2)}" style="font-weight: bold;"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Detalle Consumo Cafetería -->
+            <div th:if="${not #lists.isEmpty(consumos)}">
+                <div class="detail-section-title">Consumos de Cafetería y Café en Barra</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="cons : ${consumos}">
+                            <td th:text="${cons.producto.nombre}" style="font-weight: bold;"></td>
+                            <td th:text="${cons.producto.categoria}"></td>
+                            <td th:text="${'S/ ' + #numbers.formatDecimal(cons.producto.precio, 1, 2)}"></td>
+                            <td th:text="${cons.cantidad}"></td>
+                            <td th:text="${'S/ ' + #numbers.formatDecimal(cons.subtotal, 1, 2)}" style="font-weight: bold; color: var(--success-color);"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total de Boleta -->
+            <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1.5rem; margin-top: 2rem; border-top: 2px solid var(--primary-color); padding-top: 1rem;">
+                <span style="font-size: 1.3rem; font-weight: 700; color: var(--text-dark);">Total Cobrado:</span>
+                <span th:text="${'S/ ' + #numbers.formatDecimal(reserva.totalPago, 1, 2)}" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-color);"></span>
+            </div>
+
+            <div style="margin-top: 2.5rem; text-align: center;">
+                <a th:href="@{/reservas}" class="btn btn-secondary" style="padding: 0.6rem 2rem;">Volver al Listado</a>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
