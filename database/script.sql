@@ -105,29 +105,47 @@ CREATE TABLE consumo_detalle (
 -- INSERCIÓN DE DATOS DE PRUEBA (SEMILLA)
 -- ==========================================
 
--- 1. Insertar Roles
+-- 1. Insertar Roles (5 roles para cumplir con el mínimo de 5 filas)
 INSERT INTO rol (nombre) VALUES ('ADMINISTRADOR');
 INSERT INTO rol (nombre) VALUES ('RECEPCIONISTA');
 INSERT INTO rol (nombre) VALUES ('CLIENTE');
+INSERT INTO rol (nombre) VALUES ('BARISTA');
+INSERT INTO rol (nombre) VALUES ('GERENTE');
 
--- 2. Insertar Usuarios
+-- 2. Insertar Usuarios (12 usuarios)
 INSERT INTO usuario (email, password, id_rol) VALUES 
 ('admin@cafeorigen.pe', 'admin123', 1),
 ('juan.barista@cafeorigen.pe', 'barista123', 2),
+('sofia.recepcion@cafeorigen.pe', 'recepcion123', 2),
+('pedro.recepcion@cafeorigen.pe', 'recepcion123', 2),
+('maria.barista@cafeorigen.pe', 'barista123', 2),
+('luis.barista@cafeorigen.pe', 'barista123', 2),
 ('carlos@gmail.com', 'cliente123', 3),
-('ana@gmail.com', 'cliente123', 3);
+('ana@gmail.com', 'cliente123', 3),
+('jorge@gmail.com', 'cliente123', 3),
+('elena@gmail.com', 'cliente123', 3),
+('miguel@gmail.com', 'cliente123', 3),
+('lucia@gmail.com', 'cliente123', 3);
 
--- 3. Insertar Empleados (Asociados a sus respectivos usuarios)
+-- 3. Insertar Empleados (6 empleados)
 INSERT INTO empleado (id_usuario, nombre, cargo, sueldo, fecha_contratacion) VALUES 
 (1, 'Administrador Origen', 'Gerente General', 5500.00, '2025-01-15'),
-(2, 'Juan Barista', 'Barista Principal', 1600.00, '2025-03-20');
+(2, 'Juan Barista', 'Barista Principal', 1600.00, '2025-03-20'),
+(3, 'Sofia Recepcion', 'Recepcionista Turno Manana', 1500.00, '2025-04-10'),
+(4, 'Pedro Recepcion', 'Recepcionista Turno Tarde', 1500.00, '2025-04-12'),
+(5, 'Maria Barista', 'Barista Asistente', 1400.00, '2025-05-01'),
+(6, 'Luis Barista', 'Barista de Apoyo', 1400.00, '2025-05-05');
 
--- 4. Insertar Clientes (Asociados a sus respectivos usuarios)
+-- 4. Insertar Clientes (6 clientes)
 INSERT INTO cliente (id_usuario, nombre, telefono, direccion, dni) VALUES 
-(3, 'Carlos Mendoza', '987654321', 'Av. Larco 123, Miraflores', '12345678'),
-(4, 'Ana Torres', '912345678', 'Calle Las Flores 456, San Isidro', '87654321');
+(7, 'Carlos Mendoza', '987654321', 'Av. Larco 123, Miraflores', '12345678'),
+(8, 'Ana Torres', '912345678', 'Calle Las Flores 456, San Isidro', '87654321'),
+(9, 'Jorge Ramirez', '923456789', 'Av. Arequipa 1020, Lince', '45678912'),
+(10, 'Elena Gomez', '934567890', 'Calle Los Pinos 789, Surco', '56789123'),
+(11, 'Miguel Benitez', '945678901', 'Jr. Junin 432, Centro de Lima', '67891234'),
+(12, 'Lucia Herrera', '956789012', 'Av. Javier Prado 2200, San Borja', '78912345');
 
--- 5. Insertar Espacios / Salas
+-- 5. Insertar Espacios / Salas (6 espacios)
 INSERT INTO espacio (nombre, tipo, precio_hora, estado) VALUES 
 ('Mesa Individual 01 - Zona Silenciosa', 'Escritorio', 8.50, 'Disponible'),
 ('Mesa Individual 02 - Zona Silenciosa', 'Escritorio', 8.50, 'Disponible'),
@@ -136,7 +154,7 @@ INSERT INTO espacio (nombre, tipo, precio_hora, estado) VALUES
 ('Sala de Cata & Reuniones - Jaen', 'Sala de reunion corporativa', 40.00, 'Disponible'),
 ('Salon Coworking Premium - Origen', 'Salon', 75.00, 'Disponible');
 
--- 6. Insertar Productos de Cafetería y Café en Grano
+-- 6. Insertar Productos de Cafetería y Café en Grano (7 productos)
 INSERT INTO producto (nombre, precio, stock, categoria) VALUES 
 ('Espresso Doble (Origen Cusco)', 7.50, 100, 'Bebidas Calientes'),
 ('Capuccino Vainilla', 9.50, 80, 'Bebidas Calientes'),
@@ -145,3 +163,30 @@ INSERT INTO producto (nombre, precio, stock, categoria) VALUES
 ('Café en Grano Cusco Premium 250g', 38.00, 25, 'Café en Grano'),
 ('Torta de Chocolate de la Casa', 12.50, 15, 'Postres'),
 ('Muffin de Arándanos', 6.50, 20, 'Postres');
+
+-- 7. Insertar Reservas (6 reservas cabecera)
+INSERT INTO reserva (id_cliente, total_pago) VALUES
+(1, 17.00),
+(2, 105.00),
+(3, 181.50),
+(4, 91.00),
+(5, 33.00),
+(6, 45.00);
+
+-- 8. Insertar Detalles de Espacios (Reservas entre el 25 y 30 de Junio 2026)
+INSERT INTO reserva_detalle (id_reserva, id_espacio, fecha_reserva, hora_inicio, horas_uso, subtotal) VALUES
+(1, 1, '2026-06-25', 9, 2, 17.00),
+(2, 4, '2026-06-26', 14, 2, 90.00),
+(3, 6, '2026-06-27', 16, 2, 150.00),
+(4, 5, '2026-06-28', 18, 2, 80.00),
+(5, 3, '2026-06-29', 10, 2, 20.00),
+(6, 4, '2026-06-30', 9, 1, 45.00);
+
+-- 9. Insertar Consumos de Cafetería (5 registros para cumplir mínimo de 5 filas)
+INSERT INTO consumo_detalle (id_reserva, id_producto, cantidad, subtotal) VALUES
+(2, 1, 2, 15.00),
+(3, 6, 1, 12.50),
+(3, 2, 2, 19.00),
+(4, 3, 1, 11.00),
+(5, 7, 2, 13.00);
+
