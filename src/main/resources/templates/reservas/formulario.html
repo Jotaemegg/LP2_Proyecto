@@ -233,9 +233,15 @@
                         }
                     }
                     
-                    if (state === "disponible" && selectionStart !== null && selectionEnd !== null) {
-                        if (h >= selectionStart && h < selectionEnd) {
-                            state = "seleccionado";
+                    if (state === "disponible" && selectionStart !== null) {
+                        if (selectionEnd !== null) {
+                            if (h >= selectionStart && h < selectionEnd) {
+                                state = "seleccionado";
+                            }
+                        } else {
+                            if (h === selectionStart) {
+                                state = "seleccionado";
+                            }
                         }
                     }
                     
@@ -264,14 +270,15 @@
                         if (state === "ocupado" || state === "limpieza") return;
                         
                         if (selectionStart === null || (selectionStart !== null && selectionEnd !== null)) {
-                            // Iniciar nueva selección
+                            // Primer clic: abre un rango con una hora inicial
                             selectionStart = h;
-                            selectionEnd = h + 1;
+                            selectionEnd = null;
                         } else {
-                            // Cerrar el rango
+                            // Segundo clic: define fin de rango
                             if (h < selectionStart) {
+                                // Reinicia rango si el clic es anterior a la hora inicial
                                 selectionStart = h;
-                                selectionEnd = h + 1;
+                                selectionEnd = null;
                             } else {
                                 // Verificar que no haya traslapes en el rango intermedio
                                 let valid = true;
@@ -291,14 +298,20 @@
                                 } else {
                                     alert("El rango seleccionado interfiere con una reserva existente o su hora de limpieza.");
                                     selectionStart = h;
-                                    selectionEnd = h + 1;
+                                    selectionEnd = null;
                                 }
                             }
                         }
                         
+                        // Si se seleccionó sólo inicio, consideramos duración de 1 hora por defecto al enviar
                         inputHoraInicio.value = selectionStart;
-                        inputHorasUso.value = selectionEnd - selectionStart;
-                        resumenSeleccion.innerText = `Horario seleccionado: de ${selectionStart}:00 a ${selectionEnd}:00 (${selectionEnd - selectionStart} hora(s) de uso)`;
+                        inputHorasUso.value = selectionEnd ? (selectionEnd - selectionStart) : 1;
+                        
+                        if (selectionEnd !== null) {
+                            resumenSeleccion.innerText = `Horario seleccionado: de ${selectionStart}:00 a ${selectionEnd}:00 (${selectionEnd - selectionStart} hora(s) de uso)`;
+                        } else {
+                            resumenSeleccion.innerText = `Horario seleccionado: de ${selectionStart}:00 a ${selectionStart + 1}:00 (1 hora de uso)`;
+                        }
                         
                         renderGrid();
                     });
