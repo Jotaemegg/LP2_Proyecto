@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Café Origen - Iniciar Sesión</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
     <style>
         body {
             display: flex;
@@ -37,11 +37,24 @@
             color: #6F4E37;
             font-weight: 700;
             letter-spacing: 1.5px;
+            margin: 0;
+            text-decoration: none;
+            border: none;
         }
         .logo-section p {
             color: #7E726B;
             font-size: 0.9rem;
-            margin-top: 0.25rem;
+            margin-top: 0.35rem;
+            text-decoration: none;
+            border: none;
+        }
+        .logo-section a,
+        .logo-section a:link,
+        .logo-section a:visited,
+        .logo-section a:hover {
+            color: #6F4E37;
+            text-decoration: none !important;
+            border: none;
         }
         .demo-credentials {
             margin-top: 1.5rem;
@@ -61,7 +74,7 @@
     <div class="login-container">
         <div class="logo-section">
             <h2>CAFÉ ORIGEN</h2>
-            <p>Especialidad & Coworking</p>
+            <p>Especialidad &amp; Coworking</p>
         </div>
 
         <!-- Alertas de Error -->

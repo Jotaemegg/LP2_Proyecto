@@ -34,8 +34,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		
-
+				
+		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		    <version>2.6.0</version>
+		</dependency>
 		
 		<!-- MySQL Connector -->
 		<dependency>
@@ -62,6 +66,18 @@
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
+			<version>6.20.1</version>
+		</dependency>
+		<!-- Compilador Eclipse JDT requerido para compilar .jrxml en tiempo de ejecución -->
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>ecj</artifactId>
+			<version>3.33.0</version>
+		</dependency>
+		<!-- Fuentes para exportación PDF -->
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
 			<version>6.20.1</version>
 		</dependency>
 

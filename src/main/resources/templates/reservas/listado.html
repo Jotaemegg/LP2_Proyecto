@@ -4,22 +4,17 @@
     <meta charset="UTF-8">
     <title>Café Origen - Historial de Reservas</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
+    <th:block th:replace="~{fragments/navegacion :: navbarStyles}"></th:block>
 </head>
 <body>
 
-    <header>
-        <h1>CAFÉ ORIGEN S.A.C.</h1>
-        <nav>
-            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" style="font-weight: bold; color: var(--secondary-color);"></span>
-            <a th:href="@{/dashboard}">Inicio</a>
-            <a th:href="@{/logout}" class="btn-logout">Cerrar Sesión</a>
-        </nav>
-    </header>
+    <header th:replace="~{fragments/navegacion :: headerAutenticado}"></header>
 
     <div class="container">
         
         <div class="card">
+            <div th:replace="~{fragments/navegacion :: cardTop(@{/dashboard})}"></div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid var(--secondary-color); padding-bottom: 0.5rem;">
                 <h2 style="font-size: 1.5rem; color: var(--primary-color); border: none; padding: 0; margin: 0;">
                     Historial de Reservas y Alquileres

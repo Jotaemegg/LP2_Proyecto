@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>Café Origen - Detalle de Reserva</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
+    <th:block th:replace="~{fragments/navegacion :: navbarStyles}"></th:block>
     <style>
         .detail-section-title {
             font-size: 1.1rem;
@@ -18,18 +19,14 @@
 </head>
 <body>
 
-    <header>
-        <h1>CAFÉ ORIGEN S.A.C.</h1>
-        <nav>
-            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" style="font-weight: bold; color: var(--secondary-color);"></span>
-            <a th:href="@{/dashboard}">Inicio</a>
-            <a th:href="@{/logout}" class="btn-logout">Cerrar Sesión</a>
-        </nav>
-    </header>
+    <header th:replace="~{fragments/navegacion :: headerAutenticado}"></header>
 
     <div class="container" style="max-width: 800px;">
         
         <div class="card">
+            <div th:replace="~{fragments/navegacion :: cardTop(@{/reservas})}"></div>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); padding-bottom: 0.5rem; margin-bottom: 1.5rem;">
                 <h2 style="font-size: 1.5rem; color: var(--primary-color); border: none; padding: 0; margin: 0;">
                     Comprobante de Reserva N° <span th:text="${reserva.idReserva}"></span>
@@ -62,7 +59,7 @@
                 <tbody>
                     <tr th:each="detEsp : ${detallesEspacio}">
                         <td th:text="${detEsp.espacio.nombre}" style="font-weight: bold; color: var(--primary-color);"></td>
-                        <td th:text="${#localDates.format(detEsp.fechaReserva, 'dd/MM/yyyy')}"></td>
+                        <td th:text="${#temporals.format(detEsp.fechaReserva, 'dd/MM/yyyy')}"></td>
                         <td th:text="${detEsp.horaInicio + ':00 a ' + (detEsp.horaInicio + detEsp.horasUso) + ':00 (' + detEsp.horasUso + 'h)'}"></td>
                         <td th:text="${'S/ ' + #numbers.formatDecimal(detEsp.espacio.precioHora, 1, 2)}"></td>
                         <td th:text="${'S/ ' + #numbers.formatDecimal(detEsp.subtotal, 1, 2)}" style="font-weight: bold;"></td>
@@ -101,9 +98,6 @@
                 <span th:text="${'S/ ' + #numbers.formatDecimal(reserva.totalPago, 1, 2)}" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-color);"></span>
             </div>
 
-            <div style="margin-top: 2.5rem; text-align: center;">
-                <a th:href="@{/reservas}" class="btn btn-secondary" style="padding: 0.6rem 2rem;">Volver al Listado</a>
-            </div>
         </div>
 
     </div>

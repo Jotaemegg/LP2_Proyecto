@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Café Origen - Crear Cuenta</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=3)}">
     <style>
         body {
             display: flex;
@@ -38,11 +38,21 @@
             color: #6F4E37;
             font-weight: 700;
             letter-spacing: 1.5px;
+            margin: 0;
+            text-decoration: none;
         }
         .logo-section p {
             color: #7E726B;
             font-size: 0.9rem;
-            margin-top: 0.25rem;
+            margin-top: 0.35rem;
+            text-decoration: none;
+        }
+        .btn-volver-login,
+        .btn-volver-login:link,
+        .btn-volver-login:visited,
+        .btn-volver-login:hover {
+            text-decoration: none !important;
+            color: inherit;
         }
         .form-row {
             display: grid;
@@ -60,6 +70,9 @@
 <body>
 
     <div class="register-container">
+        <div style="margin-bottom: 1rem;">
+            <a th:href="@{/login}" class="btn btn-secondary btn-sm btn-volver-login">← Volver al inicio de sesión</a>
+        </div>
         <div class="logo-section">
             <h2>CAFÉ ORIGEN</h2>
             <p>Registro de Nuevo Cliente</p>

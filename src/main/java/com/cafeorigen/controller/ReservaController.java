@@ -173,15 +173,32 @@ public class ReservaController {
     }
 
     @GetMapping("/ver/{id}")
-    public String verDetallesReserva(@PathVariable("id") Integer id, HttpSession session, Model model) {
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
+    public String verDetallesReserva(@PathVariable("id") Integer id,
+                                     @RequestParam(value = "error", required = false) String error,
+                                     HttpSession session,
+                                     Model model) {
         if (!validarSesionYRol(session, "ADMINISTRADOR", "RECEPCIONISTA", "CLIENTE")) {
             return "redirect:/login";
         }
 
+        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID de reserva inválido: " + id));
+
+        if ("CLIENTE".equalsIgnoreCase(usuario.getRol().getNombre())) {
+            Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
+            if (cliente == null || reserva.getCliente() == null
+                    || !reserva.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
+                return "redirect:/reservas";
+            }
+        }
         List<ReservaDetalle> detallesEspacio = reservaDetalleRepository.findByReservaIdReserva(id);
         List<ConsumoDetalle> consumos = consumoDetalleRepository.findByReservaIdReserva(id);
+
+        if ("pdf".equalsIgnoreCase(error)) {
+            model.addAttribute("error", "No se pudo generar el PDF de la boleta. Verifica que MySQL esté activo e intenta nuevamente.");
+        }
 
         model.addAttribute("reserva", reserva);
         model.addAttribute("detallesEspacio", detallesEspacio);

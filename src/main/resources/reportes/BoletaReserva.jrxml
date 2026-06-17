@@ -31,7 +31,7 @@
 	<field name="horas_uso" class="java.lang.Integer"/>
 	<field name="subtotal_espacio" class="java.math.BigDecimal"/>
 	<field name="nombre_producto" class="java.lang.String"/>
-	<field name="cantidad" class="java.lang.Long"/>
+	<field name="cantidad" class="java.lang.Integer"/>
 	<field name="precio_producto" class="java.math.BigDecimal"/>
 	<field name="subtotal_producto" class="java.math.BigDecimal"/>
 	<background>
@@ -230,7 +230,7 @@
 			<staticText>
 				<reportElement x="10" y="65" width="535" height="30" uuid="dcb9f928-8547-4fbf-a1b7-a37a8597f742"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font italic="true"/>
+					<font isItalic="true"/>
 				</textElement>
 				<text><![CDATA[¡Gracias por visitarnos en Café Origen! Tu espacio ideal para conectar y crear.]]></text>
 			</staticText>
