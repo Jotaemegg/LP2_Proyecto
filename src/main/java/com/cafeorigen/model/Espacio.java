@@ -19,11 +19,11 @@ public class Espacio {
     private String nombre;
 
     @Column(nullable = false)
-    private String tipo; // 'Escritorio', 'Sala de Reunión', 'Oficina'
+    private String tipo;
 
     @Column(name = "precio_hora", nullable = false)
     private Double precioHora;
 
     @Column(nullable = false)
-    private String estado = "Disponible"; // 'Disponible', 'Ocupado', 'Mantenimiento'
+    private String estado = "Disponible";
 }

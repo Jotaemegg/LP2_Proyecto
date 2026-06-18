@@ -49,7 +49,6 @@ public class LoginController {
             String rolNombre = usuario.getRol().getNombre();
             String nombreMostrado = usuario.getEmail();
             
-            // Cargar y guardar en sesión el perfil correspondiente
             if ("CLIENTE".equalsIgnoreCase(rolNombre)) {
                 Optional<Cliente> clienteOpt = clienteRepository.findByUsuarioIdUsuario(usuario.getIdUsuario());
                 if (clienteOpt.isPresent()) {
@@ -83,7 +82,6 @@ public class LoginController {
             return "redirect:/login";
         }
 
-        // Obtener el nombre del perfil correspondiente
         String nombreMostrado = usuario.getEmail();
         if ("CLIENTE".equalsIgnoreCase(usuario.getRol().getNombre())) {
             Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");

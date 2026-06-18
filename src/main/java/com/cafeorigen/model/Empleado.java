@@ -24,7 +24,7 @@ public class Empleado {
     private String nombre;
 
     @Column(nullable = false)
-    private String cargo; // 'Administrador', 'Barista', 'Recepcionista'
+    private String cargo;
 
     @Column(nullable = false)
     private Double sueldo;

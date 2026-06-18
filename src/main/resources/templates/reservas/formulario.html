@@ -58,18 +58,15 @@
             <div th:replace="~{fragments/navegacion :: cardTop(@{/reservas})}"></div>
             <h2 class="card-title">Registrar Reserva de Espacio con Consumo de Cafetería</h2>
             
-            <!-- Mostrar Alerta de Error si falla la transacción o stock -->
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
             <form th:action="@{/reservas/guardar}" method="post" id="reservaForm">
                 
                 <div class="grid-formulario">
                     
-                    <!-- LADO IZQUIERDO: DETALLES DEL ALQUILER -->
                     <div>
                         <h3 style="font-size: 1.1rem; color: var(--primary-color); margin-bottom: 1rem;">1. Selección de Sala o Escritorio</h3>
                         
-                        <!-- Si el usuario es empleado o administrador, requiere seleccionar cliente -->
                         <div class="form-group" th:if="${usuario.rol.nombre != 'CLIENTE'}">
                             <label for="idCliente">Asociar a Cliente</label>
                             <select id="idCliente" name="idCliente" class="form-control" required>
@@ -96,17 +93,14 @@
                             <input type="date" id="fechaReserva" name="fechaReserva" class="form-control" th:value="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}" required>
                         </div>
 
-                        <!-- Inputs ocultos para hora de inicio y cantidad de horas -->
                         <input type="hidden" id="horaInicio" name="horaInicio" required>
                         <input type="hidden" id="horasUso" name="horasUso" required>
 
-                        <!-- Panel de Horarios Interactivo -->
                         <div class="form-group" style="margin-top: 1.5rem;">
                             <label style="font-weight: bold;">Horario de Atención (7:00 AM - 11:00 PM):</label>
                             <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0.25rem 0 0.5rem 0;">Haz clic en la hora de inicio y luego en la hora de fin para seleccionar tu rango.</p>
                             
                             <div class="horarios-grid" id="horariosGrid">
-                                <!-- Generado dinámicamente con JS -->
                             </div>
 
                             <div style="margin-top: 0.75rem; font-size: 0.8rem; display: flex; flex-wrap: wrap; gap: 0.75rem;">
@@ -122,7 +116,6 @@
                         </div>
                     </div>
 
-                    <!-- LADO DERECHO: CONSUMO DE CAFETERÍA -->
                     <div>
                         <h3 style="font-size: 1.1rem; color: var(--primary-color); margin-bottom: 1rem;">2. Carta de Cafetería y Café en Grano (Opcional)</h3>
                         
@@ -138,7 +131,6 @@
                             <tbody>
                                 <tr th:each="prod : ${productos}">
                                     <td>
-                                        <!-- Enviar ID de producto oculto -->
                                         <input type="hidden" name="productos" th:value="${prod.idProducto}">
                                         <span th:text="${prod.nombre}" style="font-weight: bold;"></span>
                                         <p th:text="${prod.categoria}" style="font-size: 0.75rem; color: var(--text-muted);"></p>
@@ -206,7 +198,6 @@
             function renderGrid() {
                 horariosGrid.innerHTML = "";
                 
-                // Horario de atención de 7:00 a 23:00 (16 horas posibles)
                 for (let h = 7; h <= 22; h++) {
                     const block = document.createElement("div");
                     block.className = "hour-block";
@@ -217,7 +208,7 @@
                     for (let o of ocupadas) {
                         let start = o.horaInicio;
                         let end = start + o.horasUso;
-                        let cleanEnd = end + 1; // 1 hora de limpieza
+                        let cleanEnd = end + 1;
                         
                         if (h >= start && h < end) {
                             state = "ocupado";
@@ -240,7 +231,6 @@
                         }
                     }
                     
-                    // Aplicar clases / estilos en base al estado
                     if (state === "ocupado") {
                         block.style.background = "#F44336";
                         block.style.color = "white";
@@ -265,17 +255,13 @@
                         if (state === "ocupado" || state === "limpieza") return;
                         
                         if (selectionStart === null || (selectionStart !== null && selectionEnd !== null)) {
-                            // Primer clic: abre un rango con una hora inicial
                             selectionStart = h;
                             selectionEnd = null;
                         } else {
-                            // Segundo clic: define fin de rango
                             if (h < selectionStart) {
-                                // Reinicia rango si el clic es anterior a la hora inicial
                                 selectionStart = h;
                                 selectionEnd = null;
                             } else {
-                                // Verificar que no haya traslapes en el rango intermedio
                                 let valid = true;
                                 for (let testH = selectionStart; testH <= h; testH++) {
                                     for (let o of ocupadas) {
@@ -298,7 +284,6 @@
                             }
                         }
                         
-                        // Si se seleccionó sólo inicio, consideramos duración de 1 hora por defecto al enviar
                         inputHoraInicio.value = selectionStart;
                         inputHorasUso.value = selectionEnd ? (selectionEnd - selectionStart) : 1;
                         

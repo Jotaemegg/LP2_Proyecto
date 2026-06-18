@@ -20,7 +20,7 @@
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
             <form th:action="@{/empleados/guardar}" th:object="${empleado}" method="post">
-                <!-- ID de Empleado oculto para saber si es edición -->
+                
                 <input type="hidden" th:field="*{idEmpleado}">
 
                 <h3 style="font-size: 1.1rem; color: var(--primary-color); margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem;">

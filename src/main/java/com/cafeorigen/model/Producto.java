@@ -25,5 +25,5 @@ public class Producto {
     private Integer stock = 0;
 
     @Column(nullable = false)
-    private String categoria; // 'Bebidas Calientes', 'Bebidas Frías', 'Café en Grano', 'Postres'
+    private String categoria;
 }

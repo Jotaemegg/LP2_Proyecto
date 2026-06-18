@@ -1,8 +1,6 @@
--- Creación de la base de datos para Café Origen (Estructura Ampliada de 9 Tablas)
 CREATE DATABASE IF NOT EXISTS db_cafeorigen;
 USE db_cafeorigen;
 
--- Borrar tablas si existen (orden correcto para evitar problemas de llaves foráneas)
 DROP TABLE IF EXISTS consumo_detalle;
 DROP TABLE IF EXISTS reserva_detalle;
 DROP TABLE IF EXISTS reserva;
@@ -13,13 +11,11 @@ DROP TABLE IF EXISTS cliente;
 DROP TABLE IF EXISTS usuario;
 DROP TABLE IF EXISTS rol;
 
--- 1. Tabla: rol
 CREATE TABLE rol (
     id_rol INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL UNIQUE
 );
 
--- 2. Tabla: usuario (Datos de acceso común)
 CREATE TABLE usuario (
     id_usuario INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -28,7 +24,6 @@ CREATE TABLE usuario (
     FOREIGN KEY (id_rol) REFERENCES rol(id_rol)
 );
 
--- 3. Tabla: cliente (Detalle específico de clientes)
 CREATE TABLE cliente (
     id_cliente INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
@@ -39,36 +34,32 @@ CREATE TABLE cliente (
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
 
--- 4. Tabla: empleado (Detalle específico del personal de la cafetería)
 CREATE TABLE empleado (
     id_empleado INT AUTO_INCREMENT PRIMARY KEY,
     id_usuario INT NOT NULL,
     nombre VARCHAR(100) NOT NULL,
-    cargo VARCHAR(100) NOT NULL, -- 'Administrador', 'Barista', 'Recepcionista'
+    cargo VARCHAR(100) NOT NULL,
     sueldo DECIMAL(10,2) NOT NULL,
     fecha_contratacion DATE NOT NULL,
     FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario) ON DELETE CASCADE
 );
 
--- 5. Tabla: espacio
 CREATE TABLE espacio (
     id_espacio INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    tipo VARCHAR(50) NOT NULL, -- 'Escritorio', 'Sala de reunion corporativa', 'Salon'
+    tipo VARCHAR(50) NOT NULL,
     precio_hora DECIMAL(10,2) NOT NULL,
-    estado VARCHAR(50) NOT NULL DEFAULT 'Disponible' -- 'Disponible', 'Ocupado', 'Mantenimiento'
+    estado VARCHAR(50) NOT NULL DEFAULT 'Disponible'
 );
 
--- 6. Tabla: producto
 CREATE TABLE producto (
     id_producto INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     precio DECIMAL(10,2) NOT NULL,
     stock INT NOT NULL DEFAULT 0,
-    categoria VARCHAR(50) NOT NULL -- 'Bebidas Calientes', 'Bebidas Frías', 'Café en Grano', 'Postres'
+    categoria VARCHAR(50) NOT NULL
 );
 
--- 7. Tabla: reserva (Cabecera, asociada directamente al Cliente)
 CREATE TABLE reserva (
     id_reserva INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
@@ -77,7 +68,6 @@ CREATE TABLE reserva (
     FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
 );
 
--- 8. Tabla: reserva_detalle (Detalle del espacio)
 CREATE TABLE reserva_detalle (
     id_reserva_detalle INT AUTO_INCREMENT PRIMARY KEY,
     id_reserva INT NOT NULL,
@@ -90,7 +80,6 @@ CREATE TABLE reserva_detalle (
     FOREIGN KEY (id_espacio) REFERENCES espacio(id_espacio)
 );
 
--- 9. Tabla: consumo_detalle (Detalle de productos consumidos)
 CREATE TABLE consumo_detalle (
     id_consumo INT AUTO_INCREMENT PRIMARY KEY,
     id_reserva INT NOT NULL,
@@ -101,18 +90,12 @@ CREATE TABLE consumo_detalle (
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
 );
 
--- ==========================================
--- INSERCIÓN DE DATOS DE PRUEBA (SEMILLA)
--- ==========================================
-
--- 1. Insertar Roles (5 roles para cumplir con el mínimo de 5 filas)
 INSERT INTO rol (nombre) VALUES ('ADMINISTRADOR');
 INSERT INTO rol (nombre) VALUES ('RECEPCIONISTA');
 INSERT INTO rol (nombre) VALUES ('CLIENTE');
 INSERT INTO rol (nombre) VALUES ('BARISTA');
 INSERT INTO rol (nombre) VALUES ('GERENTE');
 
--- 2. Insertar Usuarios (12 usuarios)
 INSERT INTO usuario (email, password, id_rol) VALUES 
 ('admin@cafeorigen.pe', 'admin123', 1),
 ('juan.barista@cafeorigen.pe', 'barista123', 2),
@@ -127,7 +110,6 @@ INSERT INTO usuario (email, password, id_rol) VALUES
 ('miguel@gmail.com', 'cliente123', 3),
 ('lucia@gmail.com', 'cliente123', 3);
 
--- 3. Insertar Empleados (6 empleados)
 INSERT INTO empleado (id_usuario, nombre, cargo, sueldo, fecha_contratacion) VALUES 
 (1, 'Administrador Origen', 'Gerente General', 5500.00, '2025-01-15'),
 (2, 'Juan Barista', 'Barista Principal', 1600.00, '2025-03-20'),
@@ -136,7 +118,6 @@ INSERT INTO empleado (id_usuario, nombre, cargo, sueldo, fecha_contratacion) VAL
 (5, 'Maria Barista', 'Barista Asistente', 1400.00, '2025-05-01'),
 (6, 'Luis Barista', 'Barista de Apoyo', 1400.00, '2025-05-05');
 
--- 4. Insertar Clientes (6 clientes)
 INSERT INTO cliente (id_usuario, nombre, telefono, direccion, dni) VALUES 
 (7, 'Carlos Mendoza', '987654321', 'Av. Larco 123, Miraflores', '12345678'),
 (8, 'Ana Torres', '912345678', 'Calle Las Flores 456, San Isidro', '87654321'),
@@ -145,7 +126,6 @@ INSERT INTO cliente (id_usuario, nombre, telefono, direccion, dni) VALUES
 (11, 'Miguel Benitez', '945678901', 'Jr. Junin 432, Centro de Lima', '67891234'),
 (12, 'Lucia Herrera', '956789012', 'Av. Javier Prado 2200, San Borja', '78912345');
 
--- 5. Insertar Espacios / Salas (6 espacios)
 INSERT INTO espacio (nombre, tipo, precio_hora, estado) VALUES 
 ('Mesa Individual 01 - Zona Silenciosa', 'Escritorio', 8.50, 'Disponible'),
 ('Mesa Individual 02 - Zona Silenciosa', 'Escritorio', 8.50, 'Disponible'),
@@ -154,7 +134,6 @@ INSERT INTO espacio (nombre, tipo, precio_hora, estado) VALUES
 ('Sala de Cata & Reuniones - Jaen', 'Sala de reunion corporativa', 40.00, 'Disponible'),
 ('Salon Coworking Premium - Origen', 'Salon', 75.00, 'Disponible');
 
--- 6. Insertar Productos de Cafetería y Café en Grano (7 productos)
 INSERT INTO producto (nombre, precio, stock, categoria) VALUES 
 ('Espresso Doble (Origen Cusco)', 7.50, 100, 'Bebidas Calientes'),
 ('Capuccino Vainilla', 9.50, 80, 'Bebidas Calientes'),
@@ -164,7 +143,6 @@ INSERT INTO producto (nombre, precio, stock, categoria) VALUES
 ('Torta de Chocolate de la Casa', 12.50, 15, 'Postres'),
 ('Muffin de Arándanos', 6.50, 20, 'Postres');
 
--- 7. Insertar Reservas (6 reservas cabecera)
 INSERT INTO reserva (id_cliente, total_pago) VALUES
 (1, 17.00),
 (2, 105.00),
@@ -173,7 +151,6 @@ INSERT INTO reserva (id_cliente, total_pago) VALUES
 (5, 33.00),
 (6, 45.00);
 
--- 8. Insertar Detalles de Espacios (Reservas entre el 25 y 30 de Junio 2026)
 INSERT INTO reserva_detalle (id_reserva, id_espacio, fecha_reserva, hora_inicio, horas_uso, subtotal) VALUES
 (1, 1, '2026-06-25', 9, 2, 17.00),
 (2, 4, '2026-06-26', 14, 2, 90.00),
@@ -182,11 +159,9 @@ INSERT INTO reserva_detalle (id_reserva, id_espacio, fecha_reserva, hora_inicio,
 (5, 3, '2026-06-29', 10, 2, 20.00),
 (6, 4, '2026-06-30', 9, 1, 45.00);
 
--- 9. Insertar Consumos de Cafetería (5 registros para cumplir mínimo de 5 filas)
 INSERT INTO consumo_detalle (id_reserva, id_producto, cantidad, subtotal) VALUES
 (2, 1, 2, 15.00),
 (3, 6, 1, 12.50),
 (3, 2, 2, 19.00),
 (4, 3, 1, 11.00),
 (5, 7, 2, 13.00);
-

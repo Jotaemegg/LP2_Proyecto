@@ -82,7 +82,6 @@ public class ReservaController {
         }
 
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        // Mostrar todos los espacios que no estén en mantenimiento
         List<Espacio> espaciosDisponibles = espacioRepository.findByEstadoNot("Mantenimiento");
         List<Producto> productosConStock = productoRepository.findByStockGreaterThan(0);
 
@@ -115,11 +114,9 @@ public class ReservaController {
         Reserva reserva = new Reserva();
         Cliente clienteAsociado;
 
-        // Determinar qué cliente se asocia a la reserva
         if ("CLIENTE".equalsIgnoreCase(usuarioLogueado.getRol().getNombre())) {
             clienteAsociado = (Cliente) session.getAttribute("clienteLogueado");
         } else {
-            // El empleado/admin seleccionó un cliente
             if (idCliente == null) {
                 model.addAttribute("error", "Debe seleccionar un cliente para la reserva.");
                 cargarFormularioError(model, usuarioLogueado);
@@ -230,7 +227,6 @@ public class ReservaController {
         }
         Reserva res = reservaRepository.findById(id).orElse(null);
         if (res != null) {
-            // Restaurar stock de productos
             List<ConsumoDetalle> consumos = consumoDetalleRepository.findByReservaIdReserva(id);
             for (ConsumoDetalle cd : consumos) {
                 Producto prod = cd.getProducto();

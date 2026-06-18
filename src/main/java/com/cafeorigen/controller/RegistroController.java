@@ -51,14 +51,12 @@ public class RegistroController {
                                    @RequestParam("dni") String dni,
                                    Model model) {
 
-        // Validar si el email ya existe
         if (usuarioRepository.findByEmail(email).isPresent()) {
             model.addAttribute("error", "El correo electrónico ya está registrado.");
             prellenarFormulario(model, nombre, email, telefono, direccion, dni);
             return "registro";
         }
 
-        // Validar si el DNI ya existe
         if (clienteRepository.findByDni(dni).isPresent()) {
             model.addAttribute("error", "El DNI ingresado ya está registrado.");
             prellenarFormulario(model, nombre, email, telefono, direccion, dni);
@@ -66,18 +64,15 @@ public class RegistroController {
         }
 
         try {
-            // Buscar rol de CLIENTE (ID = 3 en datos semilla)
             Rol rolCliente = rolRepository.findById(3)
                     .orElseThrow(() -> new RuntimeException("Rol de Cliente no encontrado."));
 
-            // 1. Crear Usuario
             Usuario usuario = new Usuario();
             usuario.setEmail(email);
-            usuario.setPassword(password); // Almacenado de forma simple para pruebas académicas
+            usuario.setPassword(password);
             usuario.setRol(rolCliente);
             Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-            // 2. Crear Cliente
             Cliente cliente = new Cliente();
             cliente.setUsuario(usuarioGuardado);
             cliente.setNombre(nombre);

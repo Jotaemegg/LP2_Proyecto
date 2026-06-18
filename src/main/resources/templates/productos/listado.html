@@ -53,7 +53,7 @@
                     </select>
                 </form>
 
-                <!-- Botón de nuevo producto (Solo Administrador) -->
+                
                 <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/productos/nuevo}" class="btn btn-primary">
                     + Nuevo Producto
                 </a>

@@ -62,7 +62,6 @@ public class EmpleadoController {
         }
         
         model.addAttribute("empleado", new Empleado());
-        // Solo mostrar roles de empleados (ADMINISTRADOR y RECEPCIONISTA), no CLIENTE
         List<Rol> rolesEmpleado = rolRepository.findAll()
                 .stream()
                 .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
@@ -85,7 +84,6 @@ public class EmpleadoController {
         }
 
         try {
-            // Validar que no se asigne rol de CLIENTE a un empleado
             Rol rol = rolRepository.findById(idRol)
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado."));
             if ("CLIENTE".equalsIgnoreCase(rol.getNombre())) {
@@ -94,31 +92,25 @@ public class EmpleadoController {
 
             Usuario usuario;
             if (empleado.getIdEmpleado() == null) {
-                // Registro Nuevo
                 if (usuarioRepository.findByEmail(email).isPresent()) {
                     throw new RuntimeException("El correo electrónico ya está en uso.");
                 }
                 usuario = new Usuario();
             } else {
-                // Edición
                 Empleado empDb = empleadoRepository.findById(empleado.getIdEmpleado())
                         .orElseThrow(() -> new RuntimeException("Empleado no encontrado."));
                 usuario = empDb.getUsuario();
-                // Validar si el correo cambió y está en uso
                 if (!usuario.getEmail().equalsIgnoreCase(email) && usuarioRepository.findByEmail(email).isPresent()) {
                     throw new RuntimeException("El nuevo correo electrónico ya está en uso.");
                 }
-                // Preservar la fecha de contratación original
                 empleado.setFechaContratacion(empDb.getFechaContratacion());
             }
 
-            // Seteo del usuario
             usuario.setEmail(email);
             usuario.setPassword(password);
             usuario.setRol(rol);
             Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
-            // Seteo del empleado
             empleado.setUsuario(usuarioGuardado);
             if (empleado.getFechaContratacion() == null) {
                 empleado.setFechaContratacion(LocalDate.now());
@@ -129,7 +121,6 @@ public class EmpleadoController {
         } catch (Exception e) {
             model.addAttribute("error", "Error al guardar empleado: " + e.getMessage());
             model.addAttribute("empleado", empleado);
-            // Solo mostrar roles de empleados, no CLIENTE
             List<Rol> rolesEmpleado = rolRepository.findAll()
                     .stream()
                     .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
@@ -149,7 +140,6 @@ public class EmpleadoController {
         Empleado empleado = empleadoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ID de empleado inválido: " + id));
         model.addAttribute("empleado", empleado);
-        // Solo mostrar roles de empleados, no CLIENTE
         List<Rol> rolesEmpleado = rolRepository.findAll()
                 .stream()
                 .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
@@ -168,13 +158,11 @@ public class EmpleadoController {
 
         Empleado empleado = empleadoRepository.findById(id).orElse(null);
         if (empleado != null) {
-            // No permitir que un admin se elimine a sí mismo
             Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
             if (empleado.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
                 redirectAttributes.addFlashAttribute("error", "No puedes eliminarte a ti mismo del sistema.");
                 return "redirect:/empleados";
             }
-            // Borrar empleado y su usuario asociado (ON DELETE CASCADE en BD)
             empleadoRepository.delete(empleado);
             redirectAttributes.addFlashAttribute("msg", "Empleado eliminado correctamente.");
         }

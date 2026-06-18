@@ -52,7 +52,7 @@
                     </select>
                 </form>
 
-                <!-- Botón de nuevo espacio (Administrador o Recepcionista) -->
+                
                 <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR' || usuario.rol.nombre == 'RECEPCIONISTA'}" th:href="@{/espacios/nuevo}" class="btn btn-primary">
                     + Nuevo Espacio
                 </a>

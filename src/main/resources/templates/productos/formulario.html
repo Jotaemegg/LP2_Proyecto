@@ -19,7 +19,7 @@
             
             <form th:action="@{/productos/guardar}" th:object="${producto}" method="post">
                 
-                <!-- Campo oculto para el ID si es edición -->
+                
                 <input type="hidden" th:field="*{idProducto}" />
 
                 <div class="form-group">

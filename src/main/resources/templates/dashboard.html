@@ -82,37 +82,37 @@
 
         <div class="dashboard-grid">
             
-            <!-- Acción: Salas / Espacios -->
+            
             <a th:href="@{/espacios}" class="action-card">
                 <h3>Salas & Mesas</h3>
                 <p>Ver salas de reuniones, salones de eventos y puestos de coworking disponibles.</p>
             </a>
 
-            <!-- Acción: Productos de Cafetería -->
+            
             <a th:href="@{/productos}" class="action-card">
                 <h3>Café & Carta</h3>
                 <p>Gestionar y ver los cafés de especialidad, insumos de barra y repostería en stock.</p>
             </a>
 
-            <!-- Acción: Nueva Reserva (Transaccional) -->
+            
             <a th:href="@{/reservas/nueva}" class="action-card">
                 <h3>Registrar Reserva</h3>
                 <p>Reservar una sala y asociar consumos iniciales de cafetería de forma atómica.</p>
             </a>
 
-            <!-- Acción: Historial de Reservas -->
+            
             <a th:href="@{/reservas}" class="action-card">
                 <h3>Historial de Reservas</h3>
                 <p>Visualizar el histórico de alquileres de espacios y consumos acumulados.</p>
             </a>
 
-            <!-- Acción: Gestión de Empleados (Solo Administrador) -->
+            
             <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/empleados}" class="action-card" style="border-color: rgba(111, 78, 55, 0.3);">
                 <h3>Gestión de Empleados</h3>
                 <p>Administrar el personal del local (recepcionistas, baristas) y configurar sus accesos.</p>
             </a>
 
-            <!-- Acción: Dashboard Ventas (Solo Administrador) -->
+            
             <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/reportes/dashboard}" target="_blank" class="action-card" style="border-color: rgba(46, 125, 50, 0.3);">
                 <h3 style="color: var(--success-color);">Dashboard Gerencial PDF</h3>
                 <p>Descargar reporte financiero en PDF con gráficos de barra analíticos.</p>

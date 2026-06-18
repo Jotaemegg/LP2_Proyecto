@@ -36,7 +36,7 @@
                 </a>
             </div>
 
-            <!-- Resumen Cabecera -->
+            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background-color: #F5F5F0; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1.5rem;">
                 <p><strong>Cliente:</strong> <span th:text="${reserva.cliente.nombre}"></span></p>
                 <p><strong>Email:</strong> <span th:text="${reserva.cliente.usuario.email}"></span></p>
@@ -44,7 +44,7 @@
                 <p><strong>Estado del Pago:</strong> <span class="badge badge-disponible">Completado</span></p>
             </div>
 
-            <!-- Detalle Alquiler de Espacio -->
+            
             <div class="detail-section-title">Servicio de Alquiler de Espacio</div>
             <table>
                 <thead>
@@ -67,7 +67,7 @@
                 </tbody>
             </table>
 
-            <!-- Detalle Consumo Cafetería -->
+            
             <div th:if="${not #lists.isEmpty(consumos)}">
                 <div class="detail-section-title">Consumos de Cafetería y Café en Barra</div>
                 <table>
@@ -92,7 +92,7 @@
                 </table>
             </div>
 
-            <!-- Total de Boleta -->
+            
             <div style="display: flex; justify-content: flex-end; align-items: center; gap: 1.5rem; margin-top: 2rem; border-top: 2px solid var(--primary-color); padding-top: 1rem;">
                 <span style="font-size: 1.3rem; font-weight: 700; color: var(--text-dark);">Total Cobrado:</span>
                 <span th:text="${'S/ ' + #numbers.formatDecimal(reserva.totalPago, 1, 2)}" style="font-size: 1.6rem; font-weight: 700; color: var(--primary-color);"></span>
