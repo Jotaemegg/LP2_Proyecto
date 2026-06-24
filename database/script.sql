@@ -28,14 +28,16 @@ CREATE TABLE empleado (
 
 CREATE TABLE categoria (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
-    descripcion VARCHAR(80) NOT NULL
+    descripcion VARCHAR(80) NOT NULL,
+    estado INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE proveedor (
     id_proveedor INT AUTO_INCREMENT PRIMARY KEY,
     razon_social VARCHAR(120) NOT NULL,
     telefono VARCHAR(20),
-    email VARCHAR(100)
+    email VARCHAR(100),
+    estado INT NOT NULL DEFAULT 1
 );
 
 CREATE TABLE producto (

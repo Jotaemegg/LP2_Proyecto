@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Controller
 @RequestMapping("/empleados")
@@ -33,18 +34,27 @@ public class EmpleadoController {
         return usuario != null && "ADMINISTRADOR".equalsIgnoreCase(usuario.getRol().getNombre());
     }
 
-    private void cargarDatos(Model model, HttpSession session) {
-        model.addAttribute("lstEmpleados", empleadoRepository.findByEstadoOrderByIdEmpleadoDesc(1));
+    private void cargarCombos(Model model, HttpSession session) {
         model.addAttribute("lstRoles", rolRepository.findAll());
         model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
     }
 
     @GetMapping
-    public String cargar(HttpSession session, Model model) {
+    public String cargar(@RequestParam(value = "buscar", required = false) String buscar,
+                         HttpSession session, Model model) {
         if (!esAdmin(session)) return "redirect:/dashboard";
 
+        List<Empleado> lista;
+        if (buscar != null && !buscar.trim().isEmpty()) {
+            lista = empleadoRepository.findByEstadoAndNombreContainingOrderByIdEmpleadoDesc(1, buscar);
+        } else {
+            lista = empleadoRepository.findByEstadoOrderByIdEmpleadoDesc(1);
+        }
+
         model.addAttribute("empleado", new Empleado());
-        cargarDatos(model, session);
+        model.addAttribute("lstEmpleados", lista);
+        model.addAttribute("buscar", buscar);
+        cargarCombos(model, session);
         return "empleados";
     }
 
@@ -100,7 +110,8 @@ public class EmpleadoController {
             model.addAttribute("empleado", empleado);
         }
 
-        cargarDatos(model, session);
+        model.addAttribute("lstEmpleados", empleadoRepository.findByEstadoOrderByIdEmpleadoDesc(1));
+        cargarCombos(model, session);
         return "empleados";
     }
 
@@ -110,7 +121,8 @@ public class EmpleadoController {
 
         Empleado empleado = empleadoRepository.findById(id).orElse(new Empleado());
         model.addAttribute("empleado", empleado);
-        cargarDatos(model, session);
+        model.addAttribute("lstEmpleados", empleadoRepository.findByEstadoOrderByIdEmpleadoDesc(1));
+        cargarCombos(model, session);
         return "empleados";
     }
 

@@ -11,4 +11,6 @@ public interface IEmpleadoRepository extends JpaRepository<Empleado, Integer> {
     Optional<Empleado> findByUsuarioIdUsuario(Integer idUsuario);
 
     List<Empleado> findByEstadoOrderByIdEmpleadoDesc(Integer estado);
+
+    List<Empleado> findByEstadoAndNombreContainingOrderByIdEmpleadoDesc(Integer estado, String nombre);
 }

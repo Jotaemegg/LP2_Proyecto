@@ -103,6 +103,18 @@
                 <p>Registrar, modificar y dar de baja cafés, insumos y repostería del catálogo.</p>
             </a>
 
+            <a th:href="@{/categorias}" class="action-card">
+                <div class="action-icon"><i class="bi bi-tags"></i></div>
+                <h3>Gestión de Categorías</h3>
+                <p>Administrar las categorías con las que se clasifican los productos del catálogo.</p>
+            </a>
+
+            <a th:href="@{/proveedores}" class="action-card">
+                <div class="action-icon"><i class="bi bi-truck"></i></div>
+                <h3>Gestión de Proveedores</h3>
+                <p>Administrar las empresas que abastecen los productos e insumos de la cafetería.</p>
+            </a>
+
             <a th:if="${usuario.rol.nombre == 'ADMINISTRADOR'}" th:href="@{/empleados}" class="action-card">
                 <div class="action-icon"><i class="bi bi-people-fill"></i></div>
                 <h3>Gestión de Empleados</h3>

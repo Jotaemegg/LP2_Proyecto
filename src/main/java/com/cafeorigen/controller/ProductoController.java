@@ -10,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/productos")
 public class ProductoController {
@@ -27,19 +29,28 @@ public class ProductoController {
         return session.getAttribute("usuarioLogueado") != null;
     }
 
-    private void cargarDatos(Model model, HttpSession session) {
-        model.addAttribute("lstProductos", productoRepository.findByEstadoOrderByIdProductoDesc(1));
-        model.addAttribute("lstCategorias", categoriaRepository.findAll());
-        model.addAttribute("lstProveedores", proveedorRepository.findAll());
+    private void cargarCombos(Model model, HttpSession session) {
+        model.addAttribute("lstCategorias", categoriaRepository.findByEstadoOrderByIdCategoriaDesc(1));
+        model.addAttribute("lstProveedores", proveedorRepository.findByEstadoOrderByIdProveedorDesc(1));
         model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
     }
 
     @GetMapping
-    public String cargar(HttpSession session, Model model) {
+    public String cargar(@RequestParam(value = "buscar", required = false) String buscar,
+                         HttpSession session, Model model) {
         if (!sesionActiva(session)) return "redirect:/login";
 
+        List<Producto> lista;
+        if (buscar != null && !buscar.trim().isEmpty()) {
+            lista = productoRepository.findByEstadoAndNombreContainingOrderByIdProductoDesc(1, buscar);
+        } else {
+            lista = productoRepository.findByEstadoOrderByIdProductoDesc(1);
+        }
+
         model.addAttribute("producto", new Producto());
-        cargarDatos(model, session);
+        model.addAttribute("lstProductos", lista);
+        model.addAttribute("buscar", buscar);
+        cargarCombos(model, session);
         return "productos";
     }
 
@@ -60,7 +71,8 @@ public class ProductoController {
         }
 
         model.addAttribute("producto", new Producto());
-        cargarDatos(model, session);
+        model.addAttribute("lstProductos", productoRepository.findByEstadoOrderByIdProductoDesc(1));
+        cargarCombos(model, session);
         return "productos";
     }
 
@@ -70,7 +82,8 @@ public class ProductoController {
 
         Producto producto = productoRepository.findById(id).orElse(new Producto());
         model.addAttribute("producto", producto);
-        cargarDatos(model, session);
+        model.addAttribute("lstProductos", productoRepository.findByEstadoOrderByIdProductoDesc(1));
+        cargarCombos(model, session);
         return "productos";
     }
 

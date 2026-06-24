@@ -8,4 +8,6 @@ import java.util.List;
 @Repository
 public interface IProductoRepository extends JpaRepository<Producto, Integer> {
     List<Producto> findByEstadoOrderByIdProductoDesc(Integer estado);
+
+    List<Producto> findByEstadoAndNombreContainingOrderByIdProductoDesc(Integer estado, String nombre);
 }

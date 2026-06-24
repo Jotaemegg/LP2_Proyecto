@@ -21,4 +21,7 @@ public class Proveedor {
     private String telefono;
 
     private String email;
+
+    @Column(nullable = false)
+    private Integer estado = 1;
 }
