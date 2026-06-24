@@ -3,11 +3,11 @@ package com.cafeorigen.controller;
 import com.cafeorigen.model.Usuario;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
@@ -25,8 +25,8 @@ import java.util.HashMap;
 @RequestMapping("/reportes")
 public class ReporteController {
 
-    private static final String PRODUCTOS_JRXML = "reportes/ReporteProductos.jrxml";
-    private static final String EMPLEADOS_JRXML = "reportes/ReporteEmpleados.jrxml";
+    private static final String PRODUCTOS_JASPER = "reportes/ReporteProductos.jasper";
+    private static final String EMPLEADOS_JASPER = "reportes/ReporteEmpleados.jasper";
 
     @Autowired
     private DataSource dataSource;
@@ -42,7 +42,7 @@ public class ReporteController {
             response.sendRedirect("/login");
             return;
         }
-        exportar(PRODUCTOS_JRXML, "Reporte_Productos_CafeOrigen.pdf", response);
+        exportar(PRODUCTOS_JASPER, "Reporte_Productos_CafeOrigen.pdf", response);
     }
 
     @GetMapping("/empleados")
@@ -53,17 +53,17 @@ public class ReporteController {
             response.sendRedirect("/dashboard");
             return;
         }
-        exportar(EMPLEADOS_JRXML, "Reporte_Empleados_CafeOrigen.pdf", response);
+        exportar(EMPLEADOS_JASPER, "Reporte_Empleados_CafeOrigen.pdf", response);
     }
 
-    private void exportar(String jrxmlPath, String fileName, HttpServletResponse response) {
+    private void exportar(String jasperPath, String fileName, HttpServletResponse response) {
         try {
-            ClassPathResource resource = new ClassPathResource(jrxmlPath);
+            ClassPathResource resource = new ClassPathResource(jasperPath);
             try (Connection conn = dataSource.getConnection();
-                 InputStream jrxmlStream = resource.getInputStream();
+                 InputStream jasperStream = resource.getInputStream();
                  ByteArrayOutputStream pdfStream = new ByteArrayOutputStream()) {
 
-                JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+                JasperReport jasperReport = (JasperReport) JRLoader.loadObject(jasperStream);
                 JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<>(), conn);
                 JasperExportManager.exportReportToPdfStream(jasperPrint, pdfStream);
 
