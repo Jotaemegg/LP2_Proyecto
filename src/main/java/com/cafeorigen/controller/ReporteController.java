@@ -1,9 +1,6 @@
 package com.cafeorigen.controller;
 
-import com.cafeorigen.model.Cliente;
-import com.cafeorigen.model.Reserva;
 import com.cafeorigen.model.Usuario;
-import com.cafeorigen.repository.IReservaRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -16,7 +13,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.sql.DataSource;
@@ -24,112 +20,65 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.util.HashMap;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/reportes")
 public class ReporteController {
 
-    private static final String BOLETA_JRXML = "reportes/BoletaReserva.jrxml";
-    private static final String DASHBOARD_JRXML = "reportes/DashboardVentas.jrxml";
+    private static final String PRODUCTOS_JRXML = "reportes/ReporteProductos.jrxml";
+    private static final String EMPLEADOS_JRXML = "reportes/ReporteEmpleados.jrxml";
 
     @Autowired
     private DataSource dataSource;
 
-    @Autowired
-    private IReservaRepository reservaRepository;
-
-    private boolean validarSesionYRol(HttpSession session, String... rolesValidos) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) {
-            return false;
-        }
-
-        String rolUsuario = usuario.getRol().getNombre();
-        for (String rol : rolesValidos) {
-            if (rol.equalsIgnoreCase(rolUsuario)) {
-                return true;
-            }
-        }
-        return false;
+    private boolean sesionActiva(HttpSession session) {
+        return session.getAttribute("usuarioLogueado") != null;
     }
 
-    @GetMapping("/boleta/{id}")
+    @GetMapping("/productos")
     @Transactional(readOnly = true)
-    public void exportarBoleta(@PathVariable("id") Integer idReserva,
-                               HttpSession session,
-                               HttpServletResponse response) throws Exception {
-        if (!validarSesionYRol(session, "ADMINISTRADOR", "RECEPCIONISTA", "CLIENTE")) {
+    public void reporteProductos(HttpSession session, HttpServletResponse response) throws Exception {
+        if (!sesionActiva(session)) {
             response.sendRedirect("/login");
             return;
         }
+        exportar(PRODUCTOS_JRXML, "Reporte_Productos_CafeOrigen.pdf", response);
+    }
 
+    @GetMapping("/empleados")
+    @Transactional(readOnly = true)
+    public void reporteEmpleados(HttpSession session, HttpServletResponse response) throws Exception {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        Reserva reserva = reservaRepository.findById(idReserva).orElse(null);
-        if (reserva == null) {
-            response.sendRedirect("/reservas");
+        if (usuario == null || !"ADMINISTRADOR".equalsIgnoreCase(usuario.getRol().getNombre())) {
+            response.sendRedirect("/dashboard");
             return;
         }
+        exportar(EMPLEADOS_JRXML, "Reporte_Empleados_CafeOrigen.pdf", response);
+    }
 
-        if ("CLIENTE".equalsIgnoreCase(usuario.getRol().getNombre())) {
-            Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
-            if (cliente == null || reserva.getCliente() == null
-                    || !reserva.getCliente().getIdCliente().equals(cliente.getIdCliente())) {
-                response.sendRedirect("/reservas");
-                return;
+    private void exportar(String jrxmlPath, String fileName, HttpServletResponse response) {
+        try {
+            ClassPathResource resource = new ClassPathResource(jrxmlPath);
+            try (Connection conn = dataSource.getConnection();
+                 InputStream jrxmlStream = resource.getInputStream();
+                 ByteArrayOutputStream pdfStream = new ByteArrayOutputStream()) {
+
+                JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+                JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap<>(), conn);
+                JasperExportManager.exportReportToPdfStream(jasperPrint, pdfStream);
+
+                byte[] pdfBytes = pdfStream.toByteArray();
+                response.setContentType("application/pdf");
+                response.setHeader("Content-Disposition", "inline; filename=" + fileName);
+                response.setContentLength(pdfBytes.length);
+                response.getOutputStream().write(pdfBytes);
+                response.getOutputStream().flush();
             }
-        }
-
-        try {
-            Map<String, Object> parameters = new HashMap<>();
-            parameters.put("ID_RESERVA", idReserva);
-
-            byte[] pdfBytes = generarPdf(BOLETA_JRXML, parameters);
-
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "inline; filename=Boleta_Reserva_" + idReserva + ".pdf");
-            response.setContentLength(pdfBytes.length);
-            response.getOutputStream().write(pdfBytes);
-            response.getOutputStream().flush();
         } catch (Exception e) {
-            response.sendRedirect("/reservas/ver/" + idReserva + "?error=pdf");
-        }
-    }
-
-    @GetMapping("/dashboard")
-    public void exportarDashboardVentas(HttpSession session, HttpServletResponse response) throws Exception {
-        if (!validarSesionYRol(session, "ADMINISTRADOR", "RECEPCIONISTA")) {
-            response.sendRedirect("/login");
-            return;
-        }
-
-        try {
-            byte[] pdfBytes = generarPdf(DASHBOARD_JRXML, new HashMap<>());
-
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "inline; filename=Dashboard_Ventas_CafeOrigen.pdf");
-            response.setContentLength(pdfBytes.length);
-            response.getOutputStream().write(pdfBytes);
-            response.getOutputStream().flush();
-        } catch (Exception e) {
-            response.sendRedirect("/dashboard?error=pdf");
-        }
-    }
-
-    private byte[] generarPdf(String jrxmlPath, Map<String, Object> parameters) throws Exception {
-        ClassPathResource resource = new ClassPathResource(jrxmlPath);
-        if (!resource.exists()) {
-            throw new IllegalStateException("No se encontró la plantilla del reporte: " + jrxmlPath);
-        }
-
-        try (Connection conn = dataSource.getConnection();
-             InputStream jrxmlStream = resource.getInputStream();
-             ByteArrayOutputStream pdfStream = new ByteArrayOutputStream()) {
-
-            JasperReport jasperReport = JasperCompileManager.compileReport(jrxmlStream);
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, conn);
-            JasperExportManager.exportReportToPdfStream(jasperPrint, pdfStream);
-            return pdfStream.toByteArray();
+            try {
+                response.sendRedirect("/dashboard?error=pdf");
+            } catch (Exception ignored) {
+            }
         }
     }
 }

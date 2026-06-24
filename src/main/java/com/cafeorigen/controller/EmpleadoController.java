@@ -12,10 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Controller
 @RequestMapping("/empleados")
@@ -30,65 +28,39 @@ public class EmpleadoController {
     @Autowired
     private IRolRepository rolRepository;
 
-    private boolean validarSesionYRol(HttpSession session, String... rolesValidos) {
+    private boolean esAdmin(HttpSession session) {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return false;
-        
-        String rolUsuario = usuario.getRol().getNombre();
-        for (String rol : rolesValidos) {
-            if (rol.equalsIgnoreCase(rolUsuario)) {
-                return true;
-            }
-        }
-        return false;
+        return usuario != null && "ADMINISTRADOR".equalsIgnoreCase(usuario.getRol().getNombre());
+    }
+
+    private void cargarDatos(Model model, HttpSession session) {
+        model.addAttribute("lstEmpleados", empleadoRepository.findByEstadoOrderByIdEmpleadoDesc(1));
+        model.addAttribute("lstRoles", rolRepository.findAll());
+        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
     }
 
     @GetMapping
-    public String listarEmpleados(HttpSession session, Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/dashboard";
-        }
-        
-        List<Empleado> empleados = empleadoRepository.findAll();
-        model.addAttribute("empleados", empleados);
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "empleados/listado";
-    }
+    public String cargar(HttpSession session, Model model) {
+        if (!esAdmin(session)) return "redirect:/dashboard";
 
-    @GetMapping("/nuevo")
-    public String mostrarFormularioRegistro(HttpSession session, Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/dashboard";
-        }
-        
         model.addAttribute("empleado", new Empleado());
-        List<Rol> rolesEmpleado = rolRepository.findAll()
-                .stream()
-                .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
-                .toList();
-        model.addAttribute("roles", rolesEmpleado);
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "empleados/formulario";
+        cargarDatos(model, session);
+        return "empleados";
     }
 
-    @PostMapping("/guardar")
+    @PostMapping("/grabar")
     @Transactional
-    public String guardarEmpleado(@ModelAttribute("empleado") Empleado empleado,
-                                  @RequestParam("email") String email,
-                                  @RequestParam("password") String password,
-                                  @RequestParam("idRol") Integer idRol,
-                                  HttpSession session,
-                                  Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/dashboard";
-        }
+    public String grabar(@ModelAttribute("empleado") Empleado empleado,
+                         @RequestParam("email") String email,
+                         @RequestParam("password") String password,
+                         @RequestParam("idRol") Integer idRol,
+                         HttpSession session,
+                         Model model) {
+        if (!esAdmin(session)) return "redirect:/dashboard";
 
         try {
             Rol rol = rolRepository.findById(idRol)
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado."));
-            if ("CLIENTE".equalsIgnoreCase(rol.getNombre())) {
-                throw new RuntimeException("No se puede asignar el rol de Cliente a un empleado.");
-            }
 
             Usuario usuario;
             if (empleado.getIdEmpleado() == null) {
@@ -96,6 +68,8 @@ public class EmpleadoController {
                     throw new RuntimeException("El correo electrónico ya está en uso.");
                 }
                 usuario = new Usuario();
+                empleado.setFechaContratacion(LocalDate.now());
+                empleado.setEstado(1);
             } else {
                 Empleado empDb = empleadoRepository.findById(empleado.getIdEmpleado())
                         .orElseThrow(() -> new RuntimeException("Empleado no encontrado."));
@@ -104,68 +78,55 @@ public class EmpleadoController {
                     throw new RuntimeException("El nuevo correo electrónico ya está en uso.");
                 }
                 empleado.setFechaContratacion(empDb.getFechaContratacion());
+                empleado.setEstado(empDb.getEstado());
             }
 
             usuario.setEmail(email);
             usuario.setPassword(password);
             usuario.setRol(rol);
-            Usuario usuarioGuardado = usuarioRepository.save(usuario);
-
-            empleado.setUsuario(usuarioGuardado);
-            if (empleado.getFechaContratacion() == null) {
-                empleado.setFechaContratacion(LocalDate.now());
+            if (usuario.getEstado() == null) {
+                usuario.setEstado(1);
             }
+
+            empleado.setUsuario(usuario);
             empleadoRepository.save(empleado);
 
-            return "redirect:/empleados";
+            model.addAttribute("mensaje", "Empleado guardado correctamente.");
+            model.addAttribute("cssmensaje", "alert alert-success");
+            model.addAttribute("empleado", new Empleado());
         } catch (Exception e) {
-            model.addAttribute("error", "Error al guardar empleado: " + e.getMessage());
+            model.addAttribute("mensaje", "Error al guardar: " + e.getMessage());
+            model.addAttribute("cssmensaje", "alert alert-danger");
             model.addAttribute("empleado", empleado);
-            List<Rol> rolesEmpleado = rolRepository.findAll()
-                    .stream()
-                    .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
-                    .toList();
-            model.addAttribute("roles", rolesEmpleado);
-            model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-            return "empleados/formulario";
         }
+
+        cargarDatos(model, session);
+        return "empleados";
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEdicion(@PathVariable("id") Integer id, HttpSession session, Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/dashboard";
-        }
+    public String editar(@PathVariable("id") Integer id, HttpSession session, Model model) {
+        if (!esAdmin(session)) return "redirect:/dashboard";
 
-        Empleado empleado = empleadoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID de empleado inválido: " + id));
+        Empleado empleado = empleadoRepository.findById(id).orElse(new Empleado());
         model.addAttribute("empleado", empleado);
-        List<Rol> rolesEmpleado = rolRepository.findAll()
-                .stream()
-                .filter(r -> !"CLIENTE".equalsIgnoreCase(r.getNombre()))
-                .toList();
-        model.addAttribute("roles", rolesEmpleado);
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "empleados/formulario";
+        cargarDatos(model, session);
+        return "empleados";
     }
 
     @GetMapping("/eliminar/{id}")
     @Transactional
-    public String eliminarEmpleado(@PathVariable("id") Integer id, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/dashboard";
-        }
+    public String eliminar(@PathVariable("id") Integer id, HttpSession session) {
+        if (!esAdmin(session)) return "redirect:/dashboard";
 
-        Empleado empleado = empleadoRepository.findById(id).orElse(null);
-        if (empleado != null) {
-            Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
-            if (empleado.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
-                redirectAttributes.addFlashAttribute("error", "No puedes eliminarte a ti mismo del sistema.");
-                return "redirect:/empleados";
+        Usuario usuarioLogueado = (Usuario) session.getAttribute("usuarioLogueado");
+        empleadoRepository.findById(id).ifPresent(emp -> {
+            if (!emp.getUsuario().getIdUsuario().equals(usuarioLogueado.getIdUsuario())) {
+                emp.setEstado(0);
+                emp.getUsuario().setEstado(0);
+                empleadoRepository.save(emp);
             }
-            empleadoRepository.delete(empleado);
-            redirectAttributes.addFlashAttribute("msg", "Empleado eliminado correctamente.");
-        }
+        });
         return "redirect:/empleados";
     }
 }

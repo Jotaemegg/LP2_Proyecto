@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface IProductoRepository extends JpaRepository<Producto, Integer> {
-    List<Producto> findByCategoria(String categoria);
-    List<Producto> findByStockGreaterThan(Integer stock);
+    List<Producto> findByEstadoOrderByIdProductoDesc(Integer estado);
 }

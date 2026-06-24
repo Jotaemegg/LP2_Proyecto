@@ -2,145 +2,44 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-    
-    <style th:fragment="navbarStyles" type="text/css">
-        header.app-header {
-            background-color: #6F4E37;
-            color: #ffffff;
-            padding: 12px 32px;
-            min-height: 68px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 24px;
-            flex-wrap: nowrap;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            box-sizing: border-box;
-        }
+    <th:block th:fragment="navbarStyles"></th:block>
 
-        header.app-header .brand-link,
-        header.app-header .brand-link:link,
-        header.app-header .brand-link:visited,
-        header.app-header .brand-link:hover,
-        header.app-header .brand-link:active,
-        header.app-header .brand-link:focus {
-            display: flex;
-            flex-direction: row;
-            flex-wrap: nowrap;
-            align-items: center;
-            gap: 12px;
-            color: #ffffff !important;
-            text-decoration: none !important;
-            outline: none;
-            flex-shrink: 0;
-        }
+    <header th:fragment="headerAutenticado">
+        <nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+            <div class="container-fluid px-3 px-lg-4">
+                <a th:href="@{/dashboard}" class="navbar-brand d-flex align-items-center gap-2" title="Ir al inicio">
+                    <span class="brand-mark">
+                        <img th:src="@{/img/logo.jpeg}" alt="Café Origen" class="brand-logo">
+                    </span>
+                    <span class="brand-title">CAFÉ ORIGEN <span class="brand-legal">S.A.C.</span></span>
+                </a>
 
-        header.app-header .brand-mark {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            background-color: rgba(255, 255, 255, 0.12);
-            color: #C0A080;
-            flex-shrink: 0;
-        }
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain"
+                        aria-controls="navMain" aria-expanded="false" aria-label="Alternar navegación">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-        header.app-header .brand-mark svg {
-            width: 24px;
-            height: 24px;
-            display: block;
-        }
-
-        header.app-header .brand-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 0.4px;
-            line-height: 1.2;
-            white-space: nowrap;
-            color: #ffffff !important;
-        }
-
-        header.app-header .brand-legal {
-            font-size: 0.8rem;
-            font-weight: 500;
-            opacity: 0.92;
-        }
-
-        header.app-header .header-nav {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 16px;
-            flex-shrink: 0;
-            flex-wrap: nowrap;
-        }
-
-        header.app-header .nav-user {
-            font-weight: 600;
-            color: #C0A080;
-            white-space: nowrap;
-            padding-right: 16px;
-            margin-right: 4px;
-            border-right: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
-        header.app-header .nav-link,
-        header.app-header .nav-link:link,
-        header.app-header .nav-link:visited,
-        header.app-header .nav-link:hover,
-        header.app-header .nav-link:active {
-            color: #ffffff !important;
-            text-decoration: none !important;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        header.app-header .btn-logout {
-            background-color: rgba(255, 255, 255, 0.15);
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        header.app-header .btn-logout:hover {
-            background-color: #C62828;
-            border-color: #C62828;
-        }
-
-        .card-top {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .btn-volver,
-        .btn-volver:link,
-        .btn-volver:visited {
-            text-decoration: none !important;
-        }
-    </style>
-
-    <header th:fragment="headerAutenticado" class="app-header">
-        <a th:href="@{/dashboard}" class="brand-link" title="Ir al inicio">
-            <span class="brand-mark" aria-hidden="true">
-                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" focusable="false">
-                    <path fill="currentColor" d="M6 8h12v2.2c0 3-2.4 5.4-5.4 5.4S7.2 13.2 7.2 10.2V8zm12.5 1.2H20c1.4 0 2.5 1.1 2.5 2.5S21.4 14.2 20 14.2h-1.5V9.2zM8 7h10c.5 0 1 .4 1 1v.2H7V8c0-.6.4-1 1-1zm1.5 13h7c-.9 1-2.2 1.6-3.5 1.6S9.4 21 8.5 20h1z"/>
-                </svg>
-            </span>
-            <span class="brand-title">CAFÉ ORIGEN <span class="brand-legal">S.A.C.</span></span>
-        </a>
-        <nav class="header-nav">
-            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" class="nav-user"></span>
-            <a th:href="@{/dashboard}" class="nav-link">Inicio</a>
-            <a th:href="@{/logout}" class="nav-link btn-logout">Cerrar Sesión</a>
+                <div class="collapse navbar-collapse" id="navMain">
+                    <ul class="navbar-nav ms-auto align-items-lg-center gap-2 gap-lg-3 mt-3 mt-lg-0">
+                        <li class="nav-item">
+                            <span th:text="${'Hola, ' + usuario.nombre + ' (' + usuario.rol.nombre + ')'}" class="nav-user"></span>
+                        </li>
+                        <li class="nav-item">
+                            <a th:href="@{/dashboard}" class="nav-link"><i class="bi bi-house-door me-1"></i>Inicio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a th:href="@{/logout}" class="btn btn-logout"><i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </nav>
     </header>
 
     <div th:fragment="cardTop(volverUrl)" class="card-top">
-        <a th:href="${volverUrl}" class="btn-volver btn btn-secondary btn-sm">← Volver</a>
+        <a th:href="${volverUrl}" class="btn-volver btn btn-secondary btn-sm">
+            <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
     </div>
 
 </body>

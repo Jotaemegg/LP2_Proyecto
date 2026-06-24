@@ -31,4 +31,7 @@ public class Empleado {
 
     @Column(name = "fecha_contratacion", nullable = false)
     private LocalDate fechaContratacion;
+
+    @Column(nullable = false)
+    private Integer estado = 1;
 }

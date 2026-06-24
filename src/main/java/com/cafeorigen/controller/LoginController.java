@@ -1,9 +1,7 @@
 package com.cafeorigen.controller;
 
-import com.cafeorigen.model.Cliente;
 import com.cafeorigen.model.Empleado;
 import com.cafeorigen.model.Usuario;
-import com.cafeorigen.repository.IClienteRepository;
 import com.cafeorigen.repository.IEmpleadoRepository;
 import com.cafeorigen.repository.IUsuarioRepository;
 import jakarta.servlet.http.HttpSession;
@@ -23,9 +21,6 @@ public class LoginController {
     private IUsuarioRepository usuarioRepository;
 
     @Autowired
-    private IClienteRepository clienteRepository;
-
-    @Autowired
     private IEmpleadoRepository empleadoRepository;
 
     @GetMapping({"/", "/login"})
@@ -38,41 +33,28 @@ public class LoginController {
 
     @PostMapping("/login")
     public String procesarLogin(@RequestParam("email") String email,
-                               @RequestParam("password") String password,
-                               HttpSession session,
-                               Model model) {
-        
+                                @RequestParam("password") String password,
+                                HttpSession session,
+                                Model model) {
+
         Optional<Usuario> usuarioOpt = usuarioRepository.findByEmailAndPassword(email, password);
-        
-        if (usuarioOpt.isPresent()) {
+
+        if (usuarioOpt.isPresent() && usuarioOpt.get().getEstado() == 1) {
             Usuario usuario = usuarioOpt.get();
-            String rolNombre = usuario.getRol().getNombre();
+
             String nombreMostrado = usuario.getEmail();
-            
-            if ("CLIENTE".equalsIgnoreCase(rolNombre)) {
-                Optional<Cliente> clienteOpt = clienteRepository.findByUsuarioIdUsuario(usuario.getIdUsuario());
-                if (clienteOpt.isPresent()) {
-                    Cliente cliente = clienteOpt.get();
-                    session.setAttribute("clienteLogueado", cliente);
-                    nombreMostrado = cliente.getNombre();
-                }
-            } else if ("ADMINISTRADOR".equalsIgnoreCase(rolNombre) || "RECEPCIONISTA".equalsIgnoreCase(rolNombre)) {
-                Optional<Empleado> empleadoOpt = empleadoRepository.findByUsuarioIdUsuario(usuario.getIdUsuario());
-                if (empleadoOpt.isPresent()) {
-                    Empleado empleado = empleadoOpt.get();
-                    session.setAttribute("empleadoLogueado", empleado);
-                    nombreMostrado = empleado.getNombre();
-                }
+            Optional<Empleado> empleadoOpt = empleadoRepository.findByUsuarioIdUsuario(usuario.getIdUsuario());
+            if (empleadoOpt.isPresent()) {
+                nombreMostrado = empleadoOpt.get().getNombre();
             }
-            
+
             usuario.setNombre(nombreMostrado);
             session.setAttribute("usuarioLogueado", usuario);
-
             return "redirect:/dashboard";
-        } else {
-            model.addAttribute("error", "Correo o contraseña incorrectos.");
-            return "login";
         }
+
+        model.addAttribute("error", "Correo o contraseña incorrectos.");
+        return "login";
     }
 
     @GetMapping("/dashboard")
@@ -81,19 +63,7 @@ public class LoginController {
         if (usuario == null) {
             return "redirect:/login";
         }
-
-        String nombreMostrado = usuario.getEmail();
-        if ("CLIENTE".equalsIgnoreCase(usuario.getRol().getNombre())) {
-            Cliente cliente = (Cliente) session.getAttribute("clienteLogueado");
-            if (cliente != null) nombreMostrado = cliente.getNombre();
-        } else {
-            Empleado empleado = (Empleado) session.getAttribute("empleadoLogueado");
-            if (empleado != null) nombreMostrado = empleado.getNombre();
-        }
-
-        usuario.setNombre(nombreMostrado);
         model.addAttribute("usuario", usuario);
-        model.addAttribute("nombreMostrado", nombreMostrado);
         return "dashboard";
     }
 

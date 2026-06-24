@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Café Origen - Mantenimiento de Productos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css(v=5)}">
+    <link rel="icon" type="image/jpeg" th:href="@{/img/logo.jpeg}">
+    <th:block th:replace="~{fragments/navegacion :: navbarStyles}"></th:block>
+</head>
+<body>
+
+    <header th:replace="~{fragments/navegacion :: headerAutenticado}"></header>
+
+    <div class="container app-container py-4">
+
+        <div th:replace="~{fragments/navegacion :: cardTop(@{/dashboard})}"></div>
+
+        <div class="row g-4">
+
+            <div class="col-lg-5">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="bi bi-cup-straw me-2"></i>
+                        <span th:text="${producto.idProducto == null ? 'Registrar Producto' : 'Modificar Producto'}">Registrar Producto</span>
+                    </h2>
+
+                    <div th:if="${mensaje}" th:class="${cssmensaje}" th:text="${mensaje}"></div>
+
+                    <form th:action="@{/productos/grabar}" th:object="${producto}" method="post">
+
+                        <input type="hidden" th:field="*{idProducto}">
+                        <input type="hidden" th:field="*{estado}">
+
+                        <div class="form-group">
+                            <label for="nombre" class="form-label">Nombre del Producto</label>
+                            <input type="text" id="nombre" th:field="*{nombre}" class="form-control"
+                                   placeholder="Ej: Espresso de Origen Cusco" required autocomplete="off">
+                        </div>
+
+                        <div class="row">
+                            <div class="col-6 form-group">
+                                <label for="precio" class="form-label">Precio (S/)</label>
+                                <input type="number" step="0.10" min="0.10" id="precio" th:field="*{precio}"
+                                       class="form-control" placeholder="0.00" required>
+                            </div>
+                            <div class="col-6 form-group">
+                                <label for="stock" class="form-label">Stock</label>
+                                <input type="number" min="0" id="stock" th:field="*{stock}"
+                                       class="form-control" placeholder="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="idCategoria" class="form-label">Categoría</label>
+                            <select id="idCategoria" th:field="*{idCategoria}" class="form-select" required>
+                                <option value="">-- Seleccione una categoría --</option>
+                                <option th:each="c : ${lstCategorias}"
+                                        th:value="${c.idCategoria}"
+                                        th:text="${c.descripcion}"></option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="idProveedor" class="form-label">Proveedor</label>
+                            <select id="idProveedor" th:field="*{idProveedor}" class="form-select" required>
+                                <option value="">-- Seleccione un proveedor --</option>
+                                <option th:each="p : ${lstProveedores}"
+                                        th:value="${p.idProveedor}"
+                                        th:text="${p.razonSocial}"></option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary flex-fill">
+                                <i class="bi bi-save me-1"></i>Guardar
+                            </button>
+                            <a th:href="@{/productos}" class="btn btn-secondary flex-fill text-center">
+                                <i class="bi bi-plus-lg me-1"></i>Nuevo
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="card">
+                    <h2 class="card-title"><i class="bi bi-list-ul me-2"></i>Catálogo de Productos</h2>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Proveedor</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="prod : ${lstProductos}">
+                                    <td th:text="${prod.idProducto}">1</td>
+                                    <td th:text="${prod.nombre}" style="font-weight: 600; color: var(--primary-color);">Café</td>
+                                    <td th:text="${prod.objCategoria != null ? prod.objCategoria.descripcion : '-'}">Cat</td>
+                                    <td th:text="${prod.objProveedor != null ? prod.objProveedor.razonSocial : '-'}">Prov</td>
+                                    <td th:text="${'S/ ' + #numbers.formatDecimal(prod.precio, 1, 2)}">S/ 0.00</td>
+                                    <td>
+                                        <span th:text="${prod.stock}"
+                                              th:classappend="${prod.stock <= 5 ? 'badge badge-ocupado' : 'badge badge-disponible'}">0</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <a th:href="@{/productos/editar/{id}(id=${prod.idProducto})}" class="btn btn-secondary btn-sm">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a th:href="@{/productos/eliminar/{id}(id=${prod.idProducto})}" class="btn btn-danger btn-sm"
+                                               onclick="return confirm('¿Dar de baja este producto del catálogo?')">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${#lists.isEmpty(lstProductos)}">
+                                    <td colspan="7" class="text-center text-cafe-muted">No hay productos registrados.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

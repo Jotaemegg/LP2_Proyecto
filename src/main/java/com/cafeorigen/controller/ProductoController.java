@@ -1,15 +1,14 @@
 package com.cafeorigen.controller;
 
 import com.cafeorigen.model.Producto;
-import com.cafeorigen.model.Usuario;
+import com.cafeorigen.repository.ICategoriaRepository;
 import com.cafeorigen.repository.IProductoRepository;
+import com.cafeorigen.repository.IProveedorRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Controller
 @RequestMapping("/productos")
@@ -18,77 +17,71 @@ public class ProductoController {
     @Autowired
     private IProductoRepository productoRepository;
 
-    private boolean validarSesionYRol(HttpSession session, String... rolesValidos) {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogueado");
-        if (usuario == null) return false;
-        
-        String rolUsuario = usuario.getRol().getNombre();
-        for (String rol : rolesValidos) {
-            if (rol.equalsIgnoreCase(rolUsuario)) {
-                return true;
-            }
-        }
-        return false;
+    @Autowired
+    private ICategoriaRepository categoriaRepository;
+
+    @Autowired
+    private IProveedorRepository proveedorRepository;
+
+    private boolean sesionActiva(HttpSession session) {
+        return session.getAttribute("usuarioLogueado") != null;
+    }
+
+    private void cargarDatos(Model model, HttpSession session) {
+        model.addAttribute("lstProductos", productoRepository.findByEstadoOrderByIdProductoDesc(1));
+        model.addAttribute("lstCategorias", categoriaRepository.findAll());
+        model.addAttribute("lstProveedores", proveedorRepository.findAll());
+        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
     }
 
     @GetMapping
-    public String listarProductos(@RequestParam(value = "categoria", required = false) String categoria,
-                                  HttpSession session,
-                                  Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR", "RECEPCIONISTA", "CLIENTE")) {
-            return "redirect:/login";
-        }
+    public String cargar(HttpSession session, Model model) {
+        if (!sesionActiva(session)) return "redirect:/login";
 
-        List<Producto> productos;
-        if (categoria != null && !categoria.isEmpty() && !"Todas".equals(categoria)) {
-            productos = productoRepository.findByCategoria(categoria);
-        } else {
-            productos = productoRepository.findAll();
-        }
-
-        model.addAttribute("productos", productos);
-        model.addAttribute("categoriaSeleccionada", categoria);
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "productos/listado";
-    }
-
-    @GetMapping("/nuevo")
-    public String mostrarFormularioRegistro(HttpSession session, Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/login";
-        }
         model.addAttribute("producto", new Producto());
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "productos/formulario";
+        cargarDatos(model, session);
+        return "productos";
     }
 
-    @PostMapping("/guardar")
-    public String guardarProducto(@ModelAttribute("producto") Producto producto, HttpSession session) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/login";
+    @PostMapping("/grabar")
+    public String grabar(@ModelAttribute("producto") Producto producto, HttpSession session, Model model) {
+        if (!sesionActiva(session)) return "redirect:/login";
+
+        try {
+            if (producto.getEstado() == null) {
+                producto.setEstado(1);
+            }
+            productoRepository.save(producto);
+            model.addAttribute("mensaje", "Producto guardado correctamente.");
+            model.addAttribute("cssmensaje", "alert alert-success");
+        } catch (Exception e) {
+            model.addAttribute("mensaje", "Error al guardar el producto.");
+            model.addAttribute("cssmensaje", "alert alert-danger");
         }
-        productoRepository.save(producto);
-        return "redirect:/productos";
+
+        model.addAttribute("producto", new Producto());
+        cargarDatos(model, session);
+        return "productos";
     }
 
     @GetMapping("/editar/{id}")
-    public String mostrarFormularioEdicion(@PathVariable("id") Integer id, HttpSession session, Model model) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/login";
-        }
-        Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("ID de producto inválido: " + id));
+    public String editar(@PathVariable("id") Integer id, HttpSession session, Model model) {
+        if (!sesionActiva(session)) return "redirect:/login";
+
+        Producto producto = productoRepository.findById(id).orElse(new Producto());
         model.addAttribute("producto", producto);
-        model.addAttribute("usuario", session.getAttribute("usuarioLogueado"));
-        return "productos/formulario";
+        cargarDatos(model, session);
+        return "productos";
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminarProducto(@PathVariable("id") Integer id, HttpSession session) {
-        if (!validarSesionYRol(session, "ADMINISTRADOR")) {
-            return "redirect:/login";
-        }
-        productoRepository.deleteById(id);
+    public String eliminar(@PathVariable("id") Integer id, HttpSession session) {
+        if (!sesionActiva(session)) return "redirect:/login";
+
+        productoRepository.findById(id).ifPresent(p -> {
+            p.setEstado(0);
+            productoRepository.save(p);
+        });
         return "redirect:/productos";
     }
 }
