@@ -91,3 +91,10 @@ INSERT INTO producto (nombre, precio, stock, id_categoria, id_proveedor, estado)
 ('Café en Grano Cusco Premium 250g', 38.00, 25, 3, 1, 1),
 ('Torta de Chocolate de la Casa', 12.50, 15, 4, 3, 1),
 ('Muffin de Arándanos', 6.50, 20, 4, 3, 1);
+
+SELECT * FROM rol;
+SELECT * FROM usuario;
+SELECT * FROM empleado;
+SELECT * FROM categoria;
+SELECT * FROM proveedor;
+SELECT * FROM producto;

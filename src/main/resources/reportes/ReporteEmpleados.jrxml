@@ -56,32 +56,32 @@
                 </graphicElement>
             </rectangle>
             <staticText>
-                <reportElement x="5" y="0" width="35" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="5" y="0" width="25" height="22" forecolor="#FFFFFF"/>
                 <textElement verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[ID]]></text>
             </staticText>
             <staticText>
-                <reportElement x="40" y="0" width="140" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="35" y="0" width="115" height="22" forecolor="#FFFFFF"/>
                 <textElement verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[Nombre]]></text>
             </staticText>
             <staticText>
-                <reportElement x="180" y="0" width="120" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="150" y="0" width="90" height="22" forecolor="#FFFFFF"/>
                 <textElement verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[Cargo]]></text>
             </staticText>
             <staticText>
-                <reportElement x="300" y="0" width="80" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="245" y="0" width="55" height="22" forecolor="#FFFFFF"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[Sueldo]]></text>
             </staticText>
             <staticText>
-                <reportElement x="380" y="0" width="115" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="312" y="0" width="158" height="22" forecolor="#FFFFFF"/>
                 <textElement verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[Correo]]></text>
             </staticText>
             <staticText>
-                <reportElement x="495" y="0" width="60" height="22" forecolor="#FFFFFF"/>
+                <reportElement x="478" y="0" width="77" height="22" forecolor="#FFFFFF"/>
                 <textElement verticalAlignment="Middle"><font size="9" isBold="true"/></textElement>
                 <text><![CDATA[Rol]]></text>
             </staticText>
@@ -91,32 +91,32 @@
     <detail>
         <band height="20">
             <textField>
-                <reportElement x="5" y="0" width="35" height="18"/>
+                <reportElement x="5" y="0" width="25" height="18"/>
                 <textElement verticalAlignment="Middle"><font size="9"/></textElement>
                 <textFieldExpression><![CDATA[$F{id_empleado}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="40" y="0" width="140" height="18"/>
+                <reportElement x="35" y="0" width="115" height="18"/>
                 <textElement verticalAlignment="Middle"><font size="9"/></textElement>
                 <textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="180" y="0" width="120" height="18"/>
+                <reportElement x="150" y="0" width="90" height="18"/>
                 <textElement verticalAlignment="Middle"><font size="9"/></textElement>
                 <textFieldExpression><![CDATA[$F{cargo}]]></textFieldExpression>
             </textField>
             <textField pattern="#,##0.00">
-                <reportElement x="300" y="0" width="80" height="18"/>
+                <reportElement x="245" y="0" width="55" height="18"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle"><font size="9"/></textElement>
                 <textFieldExpression><![CDATA[$F{sueldo}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="380" y="0" width="115" height="18"/>
+                <reportElement x="312" y="0" width="158" height="18"/>
                 <textElement verticalAlignment="Middle"><font size="8"/></textElement>
                 <textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
             </textField>
             <textField>
-                <reportElement x="495" y="0" width="60" height="18"/>
+                <reportElement x="478" y="0" width="77" height="18"/>
                 <textElement verticalAlignment="Middle"><font size="8"/></textElement>
                 <textFieldExpression><![CDATA[$F{rol}]]></textFieldExpression>
             </textField>
